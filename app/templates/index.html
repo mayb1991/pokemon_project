@@ -1,0 +1,34 @@
+<!-- coming to the website the home page will greet the user and ask to choose 
+between 2 buttons that say new user or existing user. we will have python code in
+our html to do something depending on what buttton is clicked.
+if new user home page will bring up a form to sigin up. 
+if existing user home will bring up sign form -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="Description" content="Enter your description here"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+<title>Find Your Pokemon Team</title>
+</head>
+<body>
+  <div class="container">
+  <div class="card" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">Pokemon</h5>
+      <h6 class="card-subtitle mb-2">Build The Ultimate Pokemon Team</h6>
+      <p class="card-text">Login or Sign up below to start building your team</p>
+      <a href="{{ url_for('signup') }}" class="card-link">Sign Up</a>
+      <a href="{{ url_for('login') }}" class="card-link">Login</a>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+body {
+    background-color: yellow;
+    color: blue;
+}
+
+.container a {
+    text-decoration: none;
+    
+}
+
+.container {
+    margin-left: 575px;
+    margin-top: 200px;
+}
