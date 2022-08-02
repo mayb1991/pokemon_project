@@ -50,9 +50,9 @@
 
   {% if pokemon_info %}
   <div class="card pc" style="width: 18rem;">
-    <div id="pev"><a href="#">Previous</a></div>
-    <div id="sav"><a href="#">Save</a></div>
-    <div id="nex"><a href="#">Next</a></div>
+    <div  class="card_button" id="pev"><a href="#">Previous</a></div>
+    <div class="card_button" id="sav"><a href="#">Catch</a></div>
+    <div class="card_button" id="nex"><a href="#">Next</a></div>
     <img src="{{ pokemon_info.sprite }}" class="card-img-top" alt="...">
     <div class="card-body">
       <b><h4 class="card-title">{{ pokemon_info.name.title() }}</h4></b>

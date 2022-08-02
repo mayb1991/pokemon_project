@@ -3,7 +3,7 @@ from app import app
 from flask import render_template, request, url_for, redirect
 import requests
 from app.forms import LoginForm, PokemonSearchForm, UserCreationForm
-from app.models import User
+from app.models import User, Pokemon
 from app.models import db
 from flask_login import logout_user,current_user
 
@@ -44,22 +44,25 @@ def login():
 
 
 @app.route('/user/update', methods=["GET", "POST"])
-def update(username):
+def update():
     form = UserCreationForm()
-    user_up = User.query.filter_by(username=username).first()
+   
     if request.method=="POST":
+        
         if form.validate():
             username = form.username.data
             email = form.email.data
             password = form.password.data
-
-            User.update_user(username,email,password)
-            User.saveUpdates()
+            user_up = User.query.filter(User.username==username).first()
+            print(user_up)
+            user_up.update_user(username,email,password)
+            user_up.saveUpdates()
             print("DONE!!!!!!")
-            return redirect(url_for('/pokemon_search', username=username))
+            return redirect(url_for('/pokemon_search', username=username,user_up=user_up))
         else:
             print('Invalid form. Please fill out the form correctly.', 'danger')
-    return render_template('search.html', form=form, update=user_up)
+    return render_template('search.html', form=form)
+
 
 @app.route('/logout')
 def logout():
@@ -89,10 +92,39 @@ def search():
                 'type': data['types'][0]['type']['name']
             }
         print(pokemon_info)
+        if form.validate():
+            name = form.name.data
+            ability = form.ability.data
+            type = form.type.data
+            Def = form.Def.data
+            attack = form.attack.data
+            hp = form.hp.data
+            base_exp = form.hp.data
+
+            pokemon = Pokemon(name, ability, type, Def, attack, hp, base_exp)
+
+            db.session.add(pokemon)
+            db.session.commit()
+            return render_template('search.html', form = form)
+        
         return render_template('search.html',form=form, pokemon_info = pokemon_info)
     return render_template('search.html',form=form, pokemon_info = pokemon_info)
    
 
-@app.route('/create_a_team')
-def create_a_team():
-    pass
+# @app.route('/pokedex', methods=["GET", "POST"])
+# def catch_pokemon():
+#     form = PokemonSearchForm()
+#     if form.validate():
+#         name = form.name.data
+#         ability = form.ability.data
+#         type = form.type.data
+#         Def = form.Def.data
+#         attack = form.attack.data
+#         hp = form.hp.data
+#         base_exp = form.hp.data
+
+#         pokemon = Pokemon(name, ability, type, Def, attack, hp, base_exp)
+
+#         db.session.add(pokemon)
+#         db.session.commit()
+#         return render_template('search.html', form = form)
