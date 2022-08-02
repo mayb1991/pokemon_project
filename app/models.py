@@ -4,7 +4,7 @@ from datetime import datetime
 from wtforms.validators import InputRequired, ValidationError
 
 db = SQLAlchemy()
-# conn = psycopg2.connect("dbname=db user=postgresql")
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
@@ -15,3 +15,11 @@ class User(db.Model, UserMixin):
         self.username = username
         self.email = email
         self.password = password 
+
+    def update_user(self,username,email,password):
+        self.username = username
+        self.email = email
+        self.password = password
+
+    def saveUpdates(self):
+        db.session.commit()

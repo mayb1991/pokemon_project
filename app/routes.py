@@ -1,10 +1,11 @@
+import email
 from app import app
 from flask import render_template, request, url_for, redirect
 import requests
 from app.forms import LoginForm, PokemonSearchForm, UserCreationForm
 from app.models import User
 from app.models import db
-from flask_login import logout_user
+from flask_login import logout_user,current_user
 
 
 @app.route('/')
@@ -41,6 +42,25 @@ def login():
             return redirect('/pokemon_search')
     return render_template('login.html', form = form)
 
+
+@app.route('/user/update', methods=["GET", "POST"])
+def update(username):
+    form = UserCreationForm()
+    user_up = User.query.filter_by(username=username).first()
+    if request.method=="POST":
+        if form.validate():
+            username = form.username.data
+            email = form.email.data
+            password = form.password.data
+
+            User.update_user(username,email,password)
+            User.saveUpdates()
+            print("DONE!!!!!!")
+            return redirect(url_for('/pokemon_search', username=username))
+        else:
+            print('Invalid form. Please fill out the form correctly.', 'danger')
+    return render_template('search.html', form=form, update=user_up)
+
 @app.route('/logout')
 def logout():
     logout_user()
@@ -72,3 +92,7 @@ def search():
         return render_template('search.html',form=form, pokemon_info = pokemon_info)
     return render_template('search.html',form=form, pokemon_info = pokemon_info)
    
+
+@app.route('/create_a_team')
+def create_a_team():
+    pass

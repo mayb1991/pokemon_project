@@ -7,30 +7,21 @@
 <meta name="Description" content="Enter your description here"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
-<title>Title</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<title>Update User Info</title>
 </head>
 <body>
-    <div class="container">
-        <div class="Pokeball">
-            <img src="https://seeklogo.com/images/P/pokeball-logo-DC23868CA1-seeklogo.com.png" 
-            alt="Pokeball" width="125">
-        </div>
-        <h1>Login Page</h1>
-        <div class="Logo">
-            <img src="https://cdn.europosters.eu/image/750/mugs/pokemon-logo-and-pikachu-i59768.jpg" alt="Logo"
-             width="">
-        </div>
-      </div>
-    
 
     <form class="container" method="POST">
         {{ form.hidden_tag() }}
 
         {{ form.username(class='form-control', placeholder='username') }}
+        {{ form.email(class='form-control', placeholder='email') }}
         {{ form.password(class='form-control', placeholder='password') }}
+        {{ form.confirm_password(class='form-control', placeholder='confirm password') }}
         {{ form.submit(class='btn btn-primary') }}
     </form>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>

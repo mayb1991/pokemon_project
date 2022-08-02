@@ -2,6 +2,22 @@ body {
     background-color: blue;
 }
 
-form {
+/* form {
     margin-top: 275px;
+} */
+
+h1 {
+    text-align: center;
+    padding-top: 5%;
+    color: yellow;
+}
+
+.Logo {
+    padding-left: 30%;
+    padding-bottom: 5%;
+}
+
+.Pokeball {
+    padding-left: 43%;
+    margin-top: 25px;
 }
