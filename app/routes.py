@@ -1,11 +1,10 @@
-import email
 from app import app
 from flask import render_template, request, url_for, redirect
 import requests
 from app.forms import LoginForm, PokemonSearchForm, UserCreationForm
 from app.models import User, Pokemon
 from app.models import db
-from flask_login import logout_user,current_user
+from flask_login import logout_user,current_user, login_required
 
 
 @app.route('/')
@@ -73,7 +72,7 @@ def logout():
 @app.route('/pokemon_search', methods=['GET', 'POST'])
 def search():
     form = PokemonSearchForm()
- 
+    caught = False
     pokemon_info = {}
     if request.method == 'POST':
         pn = form.name.data
@@ -91,40 +90,27 @@ def search():
                 'def': data['stats'][2]['base_stat'],
                 'type': data['types'][0]['type']['name']
             }
-        print(pokemon_info)
-        if form.validate():
-            name = form.name.data
-            ability = form.ability.data
-            type = form.type.data
-            Def = form.Def.data
-            attack = form.attack.data
-            hp = form.hp.data
-            base_exp = form.hp.data
-
-            pokemon = Pokemon(name, ability, type, Def, attack, hp, base_exp)
-
-            db.session.add(pokemon)
-            db.session.commit()
-            return render_template('search.html', form = form)
+            check_info = Pokemon.query.filter_by(name=pokemon_info['name']).first()
+            if not check_info:
+                pokemon = Pokemon(pokemon_info['name'], pokemon_info['abilities'], pokemon_info['type'], 
+                pokemon_info['def'], pokemon_info['attack'], pokemon_info['h_p'], 
+                pokemon_info['base_exp'],pokemon_info['sprite'])
+                pokemon.catch_pokemon()
+            # if current_user.team_building.filter_by(name=pokemon.name):
+            #     caught = True
         
-        return render_template('search.html',form=form, pokemon_info = pokemon_info)
-    return render_template('search.html',form=form, pokemon_info = pokemon_info)
+    return render_template('search.html',form=form, pokemon_info=pokemon_info)
+    # return render_template('search.html',form=form, pokemon_info = pokemon_info)
    
 
-# @app.route('/pokedex', methods=["GET", "POST"])
-# def catch_pokemon():
-#     form = PokemonSearchForm()
-#     if form.validate():
-#         name = form.name.data
-#         ability = form.ability.data
-#         type = form.type.data
-#         Def = form.Def.data
-#         attack = form.attack.data
-#         hp = form.hp.data
-#         base_exp = form.hp.data
-
-#         pokemon = Pokemon(name, ability, type, Def, attack, hp, base_exp)
-
-#         db.session.add(pokemon)
-#         db.session.commit()
-#         return render_template('search.html', form = form)
+@app.route('/pokeball/<string:pokemon_name>', methods=["GET", "POST"])
+@login_required
+def catch_pokemon(pokemon_name):
+    current_user.catch_poke(pokemon_name)
+    # poke = Pokemon.query.filter_by(name=pokemon_name).first()
+    # print(current_user.pokemon)
+    # if len(current_user.pokemon) < 5:
+    #     current_user.pokemon.append(poke)
+    #     current_user.catch_pokemon()
+    #     print("word")
+    return redirect(url_for('search'))

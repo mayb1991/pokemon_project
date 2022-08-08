@@ -50,9 +50,8 @@
 
   {% if pokemon_info %}
   <div class="card pc" style="width: 18rem;">
-    <div  class="card_button" id="pev"><a href="#">Previous</a></div>
-    <div class="card_button" id="sav"><a href="#">Catch</a></div>
-    <div class="card_button" id="nex"><a href="#">Next</a></div>
+    <form method="POST", action="{{ url_for('search') }}">
+    </form>
     <img src="{{ pokemon_info.sprite }}" class="card-img-top" alt="...">
     <div class="card-body">
       <b><h4 class="card-title">{{ pokemon_info.name.title() }}</h4></b>
@@ -65,14 +64,19 @@
           <b><li>Attack: {{ pokemon_info.attack }}</li></b>
           <b><li>D#: {{ pokemon_info.def }}</li></b>
         </ul>
-
+        
       </p>
     </div>
-  </div>
-  
-  
-  {% endif %}
+      <div>
+        {% if is_caught %}
+          <a href="/release/{{ pokemon_info.name }}" class="btn btn-danger">Release</a>
+          {% else %}
+          <a href="/pokeball/{{ pokemon_info.name }}" class="btn btn-primary">Catch</a>
+          {% endif %}
+      </div>
+      {% endif %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
 </body>
 </html>
+
