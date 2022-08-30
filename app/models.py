@@ -1,35 +1,54 @@
-from asyncio.windows_events import NULL
-from email.policy import default
-from pickle import NONE
 from flask_login import UserMixin, current_user
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from wtforms.validators import InputRequired, ValidationError
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 
 
 pokedex = db.Table('pokedex',
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
-    db.Column("pokemon_id", db.Integer, db.ForeignKey("pokemon.id")))
+    db.Column('caughtby_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('caught_id', db.Integer, db.ForeignKey('pokemon.id')))
+    # db.Column("user_id", db.Integer, db.ForeignKey("user.id")),
+    # db.Column("pokemon_id", db.Integer, db.ForeignKey("pokemon.id")))
+
+battles = db.Table('battle',
+    db.Column('battleWho_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('battler_id', db.Integer, db.ForeignKey('user.id')),
+
+)
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(150), nullable=False, unique=True)
     password = db.Column(db.String(250), nullable=False)
-    pokemon = db.relationship("User",
-        primaryjoin = (pokedex.c.pokemon_id==id),
-        secondaryjoin = (pokedex.c.user_id==id),
+    pokedex = db.relationship("Pokemon",
         secondary = pokedex,
-        backref = db.backref("pokedex", lazy = "dynamic"),
-        # lazy = "dynamic"    
+        backref = db.backref('pokemon_trainer', lazy = 'dynamic'),
+        lazy = 'dynamic'  
+    )
+
+
+    # team = db.relationship("Pokemon",
+    #     secondary = pokedex,
+    #     backref='pokemon_trainer',
+    #     lazy = 'dynamic'
+    # )
+
+    battle = db.relationship("User",
+        primaryjoin = (battles.c.battleWho_id == id),
+        secondaryjoin = (battles.c.battler_id == id),
+        secondary = battles,
+        backref = db.backref('battler', lazy = 'dynamic'),
+        lazy = 'dynamic'
     )
 
     def __init__(self, username, email, password):
         self.username = username
         self.email = email
-        self.password = password 
+        self.password = generate_password_hash(password)
 
     def update_user(self,username,email,password):
         self.username = username
@@ -39,14 +58,19 @@ class User(db.Model, UserMixin):
     def saveUpdates(self):
         db.session.commit()
     
-    def catch_poke(self,pokemon_name):
-        poke = Pokemon.query.filter_by(name=pokemon_name).first()
-        print(self.pokemon)
-        if len(self.pokemon) < 5:
-            self.pokemon.append(poke)
-            # self.pokemon.catch_pokemon()
-        print("word")
+    def catchPokemon(self, poke):
+        self.pokedex.append(poke)
         db.session.commit()
+
+    def releasePokemon(self,poke):
+        self.pokedex.remove(poke)
+        db.session.commit()
+
+    def battles(self, user):
+        self.battle.append(user)
+        db.session.commit()
+
+    
 
     
 

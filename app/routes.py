@@ -1,15 +1,18 @@
 from app import app
-from flask import render_template, request, url_for, redirect
+from flask import render_template, request, url_for, redirect, flash
 import requests
 from app.forms import LoginForm, PokemonSearchForm, UserCreationForm
+
 from app.models import User, Pokemon
 from app.models import db
-from flask_login import logout_user,current_user, login_required
+from flask_login import logout_user, current_user, login_required, login_user
+from werkzeug.security import check_password_hash
 
 
 @app.route('/')
 def home():
     return render_template('index.html')
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -21,15 +24,13 @@ def signup():
             email = form.email.data
             password = form.password.data
 
-            # add user to database
             user = User(username, email, password)
 
-            # add instance to our db
-            db.session.add(user) 
+            db.session.add(user)
             db.session.commit()
-            # flash("Successfully registered a new user", 'success')
             return redirect('/login')
-    return render_template('signup.html', form = form)
+    return render_template('signup.html', form=form)
+
 
 @app.route('/login',  methods=['GET', 'POST'])
 def login():
@@ -37,8 +38,15 @@ def login():
     if request.method == "POST":
         print("Post request made")
         if form.validate():
-            print("form valid")
-            return redirect('/pokemon_search')
+            user = User.query.filter_by(username=form.username.data).first()
+            if user and check_password_hash(user.password, form.password.data):
+                login_user(user)
+                flash(f'Welcome back {form.username.data}!', category='success')
+
+                print("form valid")
+                return redirect('/pokemon_search')
+            else:
+                print("wrong info")
     return render_template('login.html', form = form)
 
 
@@ -70,10 +78,11 @@ def logout():
 
 
 @app.route('/pokemon_search', methods=['GET', 'POST'])
+@login_required
 def search():
     form = PokemonSearchForm()
-    caught = False
     pokemon_info = {}
+    poke_set = set()
     if request.method == 'POST':
         pn = form.name.data
         get_pokemon_info = f"https://pokeapi.co/api/v2/pokemon/{pn}"
@@ -96,21 +105,57 @@ def search():
                 pokemon_info['def'], pokemon_info['attack'], pokemon_info['h_p'], 
                 pokemon_info['base_exp'],pokemon_info['sprite'])
                 pokemon.catch_pokemon()
-            # if current_user.team_building.filter_by(name=pokemon.name):
-            #     caught = True
+            print(current_user.id)
+            p1 = current_user.pokedex              
+            poke_set = {p.name for p in p1}
+            print(poke_set)
+            flag = False
+            if pokemon_info['name'] in poke_set:
+                flag = True
+            
         
-    return render_template('search.html',form=form, pokemon_info=pokemon_info)
-    # return render_template('search.html',form=form, pokemon_info = pokemon_info)
+            return render_template('search.html',form=form, pokemon_info=pokemon_info, flag=flag)
+    return render_template('search.html',form=form, pokemon_info = pokemon_info)
    
 
-@app.route('/pokeball/<string:pokemon_name>', methods=["GET", "POST"])
+@app.route('/myPokemon')
 @login_required
-def catch_pokemon(pokemon_name):
-    current_user.catch_poke(pokemon_name)
-    # poke = Pokemon.query.filter_by(name=pokemon_name).first()
-    # print(current_user.pokemon)
-    # if len(current_user.pokemon) < 5:
-    #     current_user.pokemon.append(poke)
-    #     current_user.catch_pokemon()
-    #     print("word")
+def getPoke():
+    # if current_user.is_authenticated():
+    pokemon = current_user.pokedex.all()
+    print(pokemon)
+    print(type(pokemon))
+    print(pokemon[0].name)
+    return render_template('user_pokedex.html',pokemon = pokemon)
+
+
+@app.route('/catchPoke/<pokemon>')
+@login_required
+def catchPoke(pokemon):
+    current_user
+    poke = Pokemon.query.filter_by(name = pokemon).first()
+    if len(current_user.pokedex.all()) < 5:
+        current_user.catchPokemon(poke)
+    else:
+        flash("Your team is full please release a Pokemon", "danger")
     return redirect(url_for('search'))
+
+@app.route('/releasePoke/<pokemon>')
+@login_required
+def releasePoke(pokemon):
+    poke = Pokemon.query.filter_by(name = pokemon).first()
+    current_user.releasePokemon(poke)
+    return redirect(url_for('getPoke'))
+
+@app.route('/battle')
+def battle_royal():
+    users = User.query.all()
+    return render_template('battle.html', users=users)
+
+
+@app.route('/battle/<int:user_id>')
+def battling(user_id):
+    user = User.query.get(user_id)
+    pokes = user.pokedex.all()
+    current_user.battles(user)
+    return render_template('battling.html', user = user, pokes=pokes)

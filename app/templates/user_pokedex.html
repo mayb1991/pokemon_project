@@ -7,36 +7,59 @@
 <meta name="Description" content="Enter your description here"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='search.css') }}">
 <title>Title</title>
 </head>
 <body>
+
+  <nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+      <img class logo src="https://seeklogo.com/images/P/Pokemon-logo-497D61B223-seeklogo.com.png" alt="Pokemon Logo" width="100">
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Dropdown
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ url_for('update') }}">Edit Profile</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('search') }}">Search</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('battle_royal') }}">Battle</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
     <h1>Welcome to you Pokedex this is where you can see all your Pokemon<br>
     you can release them from here as well as view all there stats</h1>
-    {% for pokemon in pokemon_info %}
+    {% for p in pokemon %}
     <div class="card pc" style="width: 18rem;">
-        <form method="POST", action="{{ url_for('search') }}">
-        <div  class="card_button" id="pev"><a href="#">Previous</a></div>
-        <div class="card_button" id="sav"><a href="url_for({{ pokemon_info.name }})">Catch</a></div>
-        <div class="card_button" id="nex"><a href="#">Next</a></div>
-        </form>
-        <img src="{{ pokemon_info.sprite }}" class="card-img-top" alt="...">
+        <img src="{{ p.img_url }}" class="card-img-top" alt="...">
         <div class="card-body">
-          <b><h4 class="card-title">{{ pokemon_info.name.title() }}</h4></b>
+          <b><h4 class="card-title">{{ p.name.title() }}</h4></b>
           <p class="card-text">
-            <b><p>Ability: {{ pokemon_info.abilities.title() }}</p></b>
+            <b><p>Ability: {{ p.ability.title() }}</p></b>
             <ul>
-              <b><li>Type: {{ pokemon_info.type.title() }}</li></b>
-              <b><li>Exp: {{ pokemon_info.base_exp }}</li></b>
-              <b><li>HP: {{ pokemon_info.h_p }}</li></b>
-              <b><li>Attack: {{ pokemon_info.attack }}</li></b>
-              <b><li>D#: {{ pokemon_info.def }}</li></b>
+              <b><li>Type: {{ p.type.title() }}</li></b>
+              <b><li>Exp: {{ p.base_exp }}</li></b>
+              <b><li>HP: {{ p.hp }}</li></b>
+              <b><li>Attack: {{ p.attack }}</li></b>
+              <b><li>D#: {{ p.Def }}</li></b>
+              <a href="/releasePoke/{{ p.name }}" class="btn btn-danger">Release</a>
             </ul>
-    
             </p>
         </div>
+        {% endfor %}
       </div>
-      {% endfor %}
+      
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
